@@ -1,9 +1,12 @@
 package il.ac.tau.cs.software1.bigram;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
 
 public class BigramModel {
+
     public static final int MAX_VOCABULARY_SIZE = 14500;
     public static final String VOC_FILE_SUFFIX = ".voc";
     public static final String COUNTS_FILE_SUFFIX = ".counts";
@@ -79,8 +82,40 @@ public class BigramModel {
      * @post: mBigramCounts = prev(mBigramCounts)
      */
     public String[] buildVocabularyIndex(String fileName) throws IOException { // Question 1
-        // TODO: implement
-        return null;
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        String[] outputWords = new String[MAX_VOCABULARY_SIZE];
+        String currLine;
+        int i = 0; // this will be our indicator where the next empty slot is.
+        while ((currLine = br.readLine()) != null && i < MAX_VOCABULARY_SIZE) {
+            String trimmed = currLine.trim();
+            if(trimmed.isEmpty()){ // so we won't add any empty words.
+                continue;
+            }
+            String[] words = trimmed.split("\\s+");
+            for (String word : words) {
+                word = normalizeWord(word);
+                if(word == null){
+                    continue;
+                }
+                if (!containsWord(outputWords, i, word) && i<MAX_VOCABULARY_SIZE){
+                    outputWords[i] = word;
+                    i++;
+                }
+            }
+        }
+        br.close();
+        String[] result = new String[i];
+        System.arraycopy(outputWords, 0, result, 0, i);
+        return result;
+    }
+
+    private static boolean containsWord(String[] arr, int count, String word) {
+        for (int i = 0; i < count; i++) {
+            if(arr[i].equals(word)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /*
