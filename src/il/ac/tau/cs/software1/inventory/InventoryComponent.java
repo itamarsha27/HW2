@@ -16,8 +16,7 @@ public class InventoryComponent implements IComponent {
 
 	private Inventory inventory = new NaiveInventory();
 	private float maxWeight = INITIAL_MAX_WEIGHT;
-	private InventoryComponent inventoryComponent = new InventoryComponent();
-
+	
 	public Inventory getInventory() {
 		return this.inventory;
 	}
@@ -34,7 +33,4 @@ public class InventoryComponent implements IComponent {
 		this.maxWeight = maxWeight;
 	}
 
-	public InventoryComponent getInventoryComponent() {
-		return this.inventoryComponent;
-	}
 }
