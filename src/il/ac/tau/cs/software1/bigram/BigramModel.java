@@ -24,9 +24,9 @@ public class BigramModel {
         mBigramCounts = buildCountsArray(fileName, mVocabulary);
     }
 
-    ///////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
     // Helper methods - already implemented for you. Use them!
-    ///////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
 
     /*
      * Converts a single token (a whitespace-free piece of text from the file)
@@ -76,9 +76,9 @@ public class BigramModel {
         return ELEMENT_NOT_FOUND;
     }
 
-    ///////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
     // Questions 1 - 5: implement these
-    ///////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
 
     /*
      * @post: mVocabulary = prev(mVocabulary)
@@ -186,7 +186,31 @@ public class BigramModel {
      * @pre: fileName is a legal file path
      */
     public void loadModel(String fileName) throws IOException { // Question 4
-        // TODO: implement
+        BufferedReader brVoc = new BufferedReader(new FileReader(fileName + VOC_FILE_SUFFIX));
+        BufferedReader brCounts = new BufferedReader(new FileReader(fileName + COUNTS_FILE_SUFFIX));
+        String[] tokens = brVoc.readLine().trim().split("\\s+");
+        int vocabLength = Integer.parseInt(tokens[0]);
+        String[] mVocab = new String[vocabLength];
+        String currLine;
+        String[] currTokens;
+        for (int i = 0; i < vocabLength; i++) {
+            currLine = brVoc.readLine();
+            currTokens = currLine.split(",", 2); // split at the first comma only: [index,word].
+            mVocab[i] = currTokens[1];
+        }
+        int[][] counts = new int[vocabLength][vocabLength];
+        String[] currIndices;
+        while ((currLine = brCounts.readLine()) != null) {
+            currTokens = currLine.split(":"); // now we have [OUR_INDEXES, COUNTS]
+            currIndices = currTokens[0].split(","); // now we have currIndices = [index1,index2] and currTokens[1] =
+                                                    // counts
+            counts[Integer.parseInt(currIndices[0])][Integer.parseInt(currIndices[1])] = Integer
+                    .parseInt(currTokens[1]);
+        }
+        brCounts.close();
+        brVoc.close();
+        this.mVocabulary = mVocab;
+        this.mBigramCounts = counts;
     }
 
     /*
@@ -200,14 +224,35 @@ public class BigramModel {
      * $ret = false
      */
     public boolean isLegalSentence(String sentence) { // Question 5
-        // TODO: implement
-        return false;
+        if (sentence.equals("")){
+            return true;
+        }
+        String[] sentenceWords = sentence.split(" "); // all the words in the sentence
+        int[] indicesOfWordsInVocab = new int[sentenceWords.length]; // maps each word in the sentence to its place in
+                                                                     // the vocab
+        int i = 0;
+        for (String word : sentenceWords) {
+            int currIndex = findIndex(this.mVocabulary, word);
+            if (currIndex != ELEMENT_NOT_FOUND){
+                indicesOfWordsInVocab[i] = currIndex;
+                i++;
+            }   
+            else{
+                return false;
+            }
+        }
+        for (int j = 0; j < sentenceWords.length - 1; j++) {
+            if (this.mBigramCounts[indicesOfWordsInVocab[j]][indicesOfWordsInVocab[j + 1]] == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    ///////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
     // Queries on the model - already implemented for you.
     // They start working once Questions 1 - 2 are done.
-    ///////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
 
     /*
      * @pre: word is in lowercase
