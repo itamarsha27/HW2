@@ -8,14 +8,15 @@ import il.ac.tau.cs.software1.math.Vector2;
  */
 public class InventoryComponent implements IComponent {
 
-	// Collected objects are not destroyed. They are moved here, far outside of the screen.
+	// Collected objects are not destroyed. They are moved here, far outside of the
+	// screen.
 	private static final Vector2 INVENTORY_POSITION = new Vector2(-100.0f, -100.0f);
 
 	private static final float INITIAL_MAX_WEIGHT = 10.0f;
 
 	private Inventory inventory = new NaiveInventory();
 	private float maxWeight = INITIAL_MAX_WEIGHT;
-
+	private InventoryComponent inventoryComponent = new InventoryComponent();
 
 	public Inventory getInventory() {
 		return this.inventory;
@@ -31,5 +32,9 @@ public class InventoryComponent implements IComponent {
 
 	public void setMaxWeight(float maxWeight) {
 		this.maxWeight = maxWeight;
+	}
+
+	public InventoryComponent getInventoryComponent() {
+		return this.inventoryComponent;
 	}
 }
